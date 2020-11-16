@@ -45,6 +45,6 @@ class CosmosQueryClient ():
         except Exception as e:
             print(e)
             logging.error(f"ISSUE {e}")
-        productIDs = json.loads([json.dumps(x) for x in query_result_items][0])["recommendations"]
+        productIDs = json.loads([json.dumps(x) for x in query_result_items][0])["product_ids"]
         user_rec_object = {"user_id": userID, "items": self.getProductDetails(productIDs)} 
         return user_rec_object
