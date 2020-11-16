@@ -36,7 +36,7 @@ class CosmosQueryClient ():
         return product_details
 
     def getUserRecommendations(self, userID):
-        query_statement = f"SELECT * FROM c WHERE c.user_id = '{userID}'"
+        query_statement = f"SELECT * FROM c WHERE c.user_id = {userID}"
         try:
             
             query_result_items = self.user_rec_container.query_items(query=f'{query_statement}',
