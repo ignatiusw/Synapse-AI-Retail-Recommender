@@ -31,7 +31,7 @@ $kubernateservice = "contosoretailk8s$surfix"
 
 ((Get-Content -path .\Deploy3.ps1.template -Raw) -replace '{resourcegroup}', $resourceGroupName) | Set-Content -Path .\Deploy3.ps1
 ((Get-Content -path .\Deploy3.ps1 -Raw) -replace '{storageaccount}', $storageAccountName) | Set-Content -Path .\Deploy3.ps1
-((Get-Content -path .\Deploy3.ps1 -Raw) -replace '{cosmosdbname}', $storageAccountName) | Set-Content -Path .\Deploy3.ps1
+((Get-Content -path .\Deploy3.ps1 -Raw) -replace '{cosmosdbname}', $azurecosmoaccount) | Set-Content -Path .\Deploy3.ps1
 
 Write-Host "Login Azure.....`r`n"
 az login
@@ -82,9 +82,9 @@ Write-Host "Step 1 - Creating Azure Container Registry done.`r`n"
 
 Write-Host "Step 2 - Azure Kubernetes Service (AKS) ..."
 
-$aksResult = az ad sp create-for-rbac --skip-assignment --name contosoretailsp$surfix"
+$aksResult = az ad sp create-for-rbac --skip-assignment --name "contosoretailsp$surfix"
 
-Write-Host "$aksResult
+Write-Host $aksResult
 
 $appid = ($aksResult | ConvertFrom-Json).appId
 $displayName = ($aksResult | ConvertFrom-Json).displayName
@@ -100,7 +100,7 @@ Write-Host "Step 2.2 - Creating Kubernetes Service Cluster ..."
 az aks create --name $kubernateservice `
     --resource-group $resourceGroupName `
     --location $location  `
-    --kubernetes-version 1.17.5 `
+    --kubernetes-version 1.17.13 `
     --node-vm-size Standard_D2_v2 `
     --node-count 1 `
     --service-principal "$appid" `
@@ -201,7 +201,7 @@ helm repo update
 helm install `
     cert-manager jetstack/cert-manager `
     --namespace cert-manager `
-    --version v0.15.0 `
+    --version v1.0.4 `
     --set ingressShim.defaultIssuerName=letsencrypt-prod `
     --set ingressShim.defaultIssuerKind=ClusterIssuer `
     --set ingressShim.defaultIssuerGroup=cert-manager.io `
@@ -214,7 +214,7 @@ helm install `
 kubectl create namespace ingress-nginx
 kubectl label namespace ingress-nginx cert-manager.io/disable-validation=true
 
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add stable https://charts.helm.sh/stable
 helm install nginx stable/nginx-ingress `
     --namespace ingress-nginx `
     --set controller.replicaCount=2 `
